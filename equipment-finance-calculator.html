@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Equipment Finance Calculator</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #64748b; /* For general secondary text, input borders etc. */
+            --success-color: #059669;
+            --background-color: #f1f5f9;
+            --card-background: #ffffff;
+            --text-color: #1e293b;
+            --border-color: #e2e8f0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.5;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .calculator-card {
+            background: var(--card-background);
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: var(--primary-color);
+            color: white;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .calculator-body {
+            padding: 2rem;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .form-group label {
+            font-weight: 500;
+            color: var(--text-color);
+        }
+
+        .input-group {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .currency {
+            position: absolute;
+            left: 0.75rem;
+            color: var(--secondary-color);
+        }
+        
+        .percentage { /* Added for percentage inputs */
+            position: absolute;
+            right: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--secondary-color);
+        }
+
+        input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            transition: border-color 0.2s;
+        }
+
+        input[type="text"] {
+            padding-left: 2rem;
+        }
+        input[type="number"] { /* Ensure padding for percentage symbol if needed */
+             /* padding-right: 2.5rem; Default, adjust if .percentage class is used */
+        }
+        .input-group input[type="number"] { /* More specific for inputs within a group that might have a symbol */
+            padding-right: 2.5rem;
+        }
+
+
+        input.date-input { /* Keep specific styling for date input */
+             padding-left: 0.75rem !important;
+        }
+
+
+        input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #1d4ed8;
+        }
+
+        .btn-secondary {
+            background: var(--secondary-color);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #475569;
+        }
+
+        .results {
+            border-top: 1px solid var(--border-color);
+            padding-top: 2rem;
+        }
+
+        .results.hidden {
+            display: none;
+        }
+
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .summary-card {
+            background: var(--background-color);
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            text-align: center;
+        }
+
+        .summary-card h3 {
+            font-size: 1rem;
+            color: var(--secondary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .summary-card p {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-color);
+        }
+
+        .payment-schedule {
+            margin-top: 2rem;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background: var(--background-color);
+            font-weight: 600;
+        }
+
+        .footer-note {
+            margin-top: 1.5rem;
+            color: var(--secondary-color);
+            font-size: 0.875rem;
+            text-align: center;
+        }
+
+        .download-btn {
+            margin-top: 1rem;
+            background: var(--success-color);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .download-btn:hover {
+            background: #047857;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+
+            .calculator-body {
+                padding: 1rem;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+
+        /* Added for new sections */
+        .info-section {
+            margin-top: 2.5rem;
+            padding: 1.5rem;
+            background-color: var(--card-background);
+            border-radius: 0.75rem;
+            box-shadow: 0 2px 4px -1px rgb(0 0 0 / 0.08);
+            border: 1px solid var(--border-color);
+        }
+
+        .info-section h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+        }
+        
+        .info-section h2 i.fas { 
+            margin-right: 0.75rem;
+            font-size: 1.1em; 
+            color: var(--primary-color); 
+        }
+
+        .info-section p, .info-section ul {
+            margin-bottom: 1rem;
+            color: var(--secondary-color);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+        
+        .info-section .example-box {
+            background-color: #e0e7ff; 
+            padding: 1rem;
+            border-radius: 0.5rem;
+            border-left: 4px solid var(--primary-color);
+            margin-top: 0.5rem;
+            margin-bottom: 1rem; 
+        }
+        
+        .info-section .example-box p {
+            color: #3730a3; 
+            font-size: 0.9rem;
+            margin-bottom: 0;
+        }
+
+        .disclaimer-box {
+            background-color: #fef3c7; 
+            padding: 1rem;
+            border-radius: 0.5rem;
+            border-left: 4px solid #f59e0b; 
+            margin-bottom: 1rem; 
+        }
+        
+        .disclaimer-box p {
+            color: #92400e; 
+            font-size: 0.9rem;
+            margin-bottom: 0;
+        }
+        .disclaimer-box h2 i.fas { 
+             color: #f59e0b; 
+        }
+
+        .other-calculators-list {
+            list-style: none;
+            padding-left: 0;
+            columns: 2; 
+            gap: 1rem;
+        }
+
+        .other-calculators-list li {
+            margin-bottom: 0.6rem;
+            break-inside: avoid-column; 
+        }
+
+        .other-calculators-list a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .other-calculators-list a:hover {
+            color: #1d4ed8; 
+            text-decoration: underline;
+        }
+
+        .cta-section-container { 
+             margin-top: 2.5rem;
+        }
+        .cta-section {
+            padding: 2.5rem 1.5rem; 
+            background-color: var(--primary-color); 
+            color: white;
+            border-radius: 0.75rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+        }
+
+        .cta-section .background-image-container { 
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+        }
+        .cta-section .background-image-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.1; 
+        }
+
+        .cta-section .content-wrapper {
+            position: relative;
+            z-index: 1;
+        }
+
+        .cta-section h2 {
+            font-size: 1.75rem; 
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            color: white; 
+        }
+        
+        .cta-section h2 i.fas { 
+             margin-right: 0;
+             font-size: 1em;
+             color: white; 
+        }
+
+        .cta-section p {
+            font-size: 1.05rem; 
+            margin-bottom: 1.25rem; 
+            color: rgba(255, 255, 255, 0.9);
+            max-width: 700px; 
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .cta-btn {
+            display: inline-block;
+            padding: 0.85rem 2.25rem; 
+            background-color: white;
+            color: var(--primary-color);
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 9999px; 
+            text-decoration: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+
+        .cta-btn:hover {
+            background-color: #f8fafc; 
+            color: #1d4ed8; 
+            transform: translateY(-2px) scale(1.03);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="calculator-card">
+            <div class="header">
+                <h1>Equipment Finance Calculator</h1>
+            </div>
+            <div class="calculator-body">
+                <form id="equipmentForm">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="equipmentCost">Equipment Cost</label>
+                            <div class="input-group">
+                                <span class="currency">$</span>
+                                <input type="text" id="equipmentCost" required placeholder="Enter equipment cost">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="downPayment">Down Payment</label>
+                            <div class="input-group">
+                                <span class="currency">$</span>
+                                <input type="text" id="downPayment" required placeholder="Enter down payment">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="balloonPayment">Balloon/Residual Payment</label>
+                            <div class="input-group">
+                                <span class="currency">$</span>
+                                <input type="text" id="balloonPayment" placeholder="Enter balloon payment (optional)">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="interestRate">Interest Rate (%)</label>
+                            <div class="input-group">
+                                <input type="number" id="interestRate" required min="0.1" step="0.1" placeholder="Enter interest rate">
+                                <span class="percentage">%</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="loanTerm">Loan Term (months)</label>
+                            <input type="number" id="loanTerm" required min="1" step="1" placeholder="Enter loan term">
+                        </div>
+                        <div class="form-group">
+                            <label for="startDate">Start Date</label>
+                            <input type="date" id="startDate" required class="date-input">
+                        </div>
+                    </div>
+                    <div class="button-group">
+                        <button type="submit" class="btn btn-primary">Calculate</button>
+                        <button type="button" id="resetBtn" class="btn btn-secondary">Reset</button>
+                    </div>
+                </form>
+
+                <div id="results" class="results hidden">
+                    <div class="summary-cards">
+                        <div class="summary-card">
+                            <h3>Monthly Payment</h3>
+                            <p id="monthlyPayment">$0.00</p>
+                        </div>
+                        <div class="summary-card">
+                            <h3>Total Interest</h3>
+                            <p id="totalInterest">$0.00</p>
+                        </div>
+                        <div class="summary-card">
+                            <h3>Total Amount Paid</h3>
+                            <p id="totalAmount">$0.00</p>
+                        </div>
+                    </div>
+
+                    <div class="payment-schedule">
+                        <button id="downloadCSV" class="download-btn">Download Amortization Schedule (CSV)</button>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Payment Date</th>
+                                    <th>Payment Amount</th>
+                                    <th>Principal</th>
+                                    <th>Interest</th>
+                                    <th>Remaining Balance</th>
+                                </tr>
+                            </thead>
+                            <tbody id="scheduleBody"></tbody>
+                        </table>
+                    </div>
+
+                    <div class="footer-note">
+                        Note: Repayments do not include stamp duty or other potential fees.
+                    </div>
+                </div>
+
+                <!-- How to Use Section -->
+                <div class="info-section">
+                    <h2><i class="fas fa-info-circle"></i>How to Use</h2>
+                    <p>Enter the equipment cost, any down payment, the annual interest rate, loan term in months, and an optional balloon/residual payment. The calculator will estimate your monthly payments and total costs.</p>
+                    <div class="example-box">
+                        <p><strong>Example:</strong><br>
+                        Equipment Cost: $25,000, Down Payment: $2,500, Interest Rate: 6.5%, Loan Term: 36 months, Balloon: $0<br>
+                        Estimated Monthly Payment: $694.97</p>
+                    </div>
+                </div>
+
+                <!-- Financial Disclaimer Section -->
+                <div class="info-section disclaimer-box">
+                    <h2><i class="fas fa-shield-alt"></i>Financial Disclaimer</h2>
+                    <p>This calculator provides estimates based on the information you input and is for illustrative purposes only. It does not constitute financial advice. Actual loan terms, fees, and taxes may vary. Consult with a financial advisor for personalized advice.</p>
+                </div>
+
+                <!-- Other Calculators Section -->
+                <div class="info-section">
+                    <h2><i class="fas fa-calculator"></i>Other Calculators</h2>
+                    <ul class="other-calculators-list">
+                        <li><a href="Commercial-property-calculator.html">Commercial Property Calculator</a></li>
+                        <li><a href="1auto-loan-calculator.html">Auto Loan Calculator</a></li>
+                        <li><a href="Business-Term-Loan-Calculator.html">Term Loan Calculator</a></li>
+                        <li><a href="invoice-discountingcalculator.html">Invoice Discount Finance Calculator</a></li>
+                        <li><a href="Line-of-credit-calculator.html">Line of Credit Calculator</a></li>
+                        <li><a href="index.html#commercial-calculators">View All Calculators on Homepage</a></li>
+                    </ul>
+                </div>
+
+                <!-- CTA Section Container -->
+                <div class="cta-section-container">
+                    <section class="cta-section">
+                        <div class="background-image-container">
+                            <img src="https://images.unsplash.com/photo-1551434678-e076c223a692?auto=format&fit=crop&w=2000" alt="Background">
+                        </div>
+                        <div class="content-wrapper">
+                            <h2>Ready to Turn Your Calculations into Reality?</h2>
+                            <p>You've taken the first step by using our business calculator to explore your financial possibilities. Now, let's make those numbers work for you!</p>
+                            <p>Speak with one of our experienced commercial finance professionals to develop a custom strategy tailored to your business needs. Discover how you can secure the funding necessary to achieve your business goals and drive success.</p>
+                            <p>Contact us today to schedule your personalized consultation!</p>
+                            <a href="briansavic.com" class="cta-btn">
+                                Get Started Now
+                            </a>
+                        </div>
+                    </section>
+                </div>
+            </div> <!-- End of calculator-body -->
+        </div> <!-- End of calculator-card -->
+    </div> <!-- End of container -->
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set default date to today
+            document.getElementById('startDate').valueAsDate = new Date();
+
+            // Format currency inputs with commas
+            const currencyInputs = ['equipmentCost', 'downPayment', 'balloonPayment'];
+            currencyInputs.forEach(inputId => {
+                const input = document.getElementById(inputId);
+                input.addEventListener('input', function(e) {
+                    let value = this.value.replace(/[^\d]/g, '');
+                    if (value) {
+                        value = parseInt(value).toLocaleString('en-US');
+                    }
+                    this.value = value;
+                });
+            });
+
+            // Form submission handler
+            document.getElementById('equipmentForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                calculateLoan();
+            });
+
+            // Reset button handler
+            document.getElementById('resetBtn').addEventListener('click', resetCalculator);
+
+            // Download CSV handler
+            document.getElementById('downloadCSV').addEventListener('click', downloadAmortizationSchedule);
+
+            function calculateLoan() {
+                // Get input values and remove commas from currency inputs
+                const equipmentCost = parseFloat(document.getElementById('equipmentCost').value.replace(/,/g, '')) || 0;
+                const downPayment = parseFloat(document.getElementById('downPayment').value.replace(/,/g, '')) || 0;
+                const balloonPayment = parseFloat(document.getElementById('balloonPayment').value.replace(/,/g, '')) || 0;
+                const interestRate = parseFloat(document.getElementById('interestRate').value) || 0;
+                const loanTerm = parseInt(document.getElementById('loanTerm').value) || 0;
+                const startDate = new Date(document.getElementById('startDate').value);
+
+                // Basic validation
+                if (equipmentCost <= 0) {
+                    alert('Please enter a valid equipment cost');
+                    return;
+                }
+                if (downPayment < 0) {
+                    alert('Down payment cannot be negative');
+                    return;
+                }
+                if (downPayment >= equipmentCost) {
+                    alert('Down payment cannot exceed equipment cost');
+                    return;
+                }
+                if (interestRate <= 0) {
+                    alert('Please enter a valid interest rate');
+                    return;
+                }
+                if (loanTerm <= 0) {
+                    alert('Please enter a valid loan term');
+                    return;
+                }
+                if (balloonPayment < 0) {
+                    alert('Balloon payment cannot be negative');
+                    return;
+                }
+                // Allow balloon to be equal to loan amount if it's an interest-only type setup, but not more than financed amount.
+                const financedAmount = equipmentCost - downPayment;
+                if (balloonPayment > financedAmount) {
+                     alert('Balloon payment cannot exceed the amount financed (Equipment Cost - Down Payment).');
+                     return;
+                }
+
+
+                // Calculate loan details
+                const loanAmount = equipmentCost - downPayment;
+                const monthlyRate = interestRate / 100 / 12;
+
+                // Calculate monthly payment with balloon
+                const monthlyPayment = calculateMonthlyPaymentWithBalloon(loanAmount, monthlyRate, loanTerm, balloonPayment);
+                
+                // Calculate total amounts
+                const schedule = generateScheduleData(loanAmount, monthlyRate, loanTerm, monthlyPayment, balloonPayment, startDate);
+                const totalInterest = schedule.reduce((sum, payment) => sum + payment.interest, 0);
+                // Total paid for the loan part (monthly payments + final balloon if any)
+                let totalLoanPayments = schedule.reduce((sum, payment) => sum + payment.payment, 0);
+                // The schedule's last payment already includes the balloon if the logic is correct.
+                // If balloon is handled separately, it would be: (monthlyPayment * loanTerm) + balloonPayment.
+                // For this calculator, the generateScheduleData's last payment incorporates the balloon.
+
+                // Display results
+                document.getElementById('results').classList.remove('hidden');
+                document.getElementById('monthlyPayment').textContent = formatCurrency(monthlyPayment);
+                document.getElementById('totalInterest').textContent = formatCurrency(totalInterest);
+                document.getElementById('totalAmount').textContent = formatCurrency(totalLoanPayments + downPayment); // Total out-of-pocket
+
+                // Display schedule
+                displaySchedule(schedule);
+
+                // Scroll to results
+                document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+            }
+
+            function calculateMonthlyPaymentWithBalloon(principal, monthlyRate, term, balloonPayment) {
+                if (term <= 0) return 0; // Avoid division by zero or NaN
+                if (monthlyRate === 0) {
+                    return (principal - balloonPayment) / term;
+                }
+                // Standard formula for loan payment with a balloon
+                // PMT = [P * r * (1+r)^n - FV * r] / [(1+r)^n - 1]
+                // Where P = principal, r = monthlyRate, n = term, FV = balloonPayment
+                const pvif = Math.pow(1 + monthlyRate, term);
+                let pmt = (principal * monthlyRate * pvif - balloonPayment * monthlyRate) / (pvif - 1);
+
+                // If principal is exactly covered by balloon (interest-only like scenario for the balloon part)
+                if (principal === balloonPayment && term > 0) {
+                     pmt = principal * monthlyRate; // Interest only on the principal
+                } else if (principal < balloonPayment) { // Should not happen due to validation
+                    pmt = 0; // Or handle error
+                }
+                
+                return pmt > 0 ? pmt : 0;
+            }
+
+            function generateScheduleData(principal, monthlyRate, term, monthlyPayment, balloonPayment, startDate) {
+                const schedule = [];
+                let balance = principal;
+                let currentDate = new Date(startDate);
+
+                for (let i = 1; i <= term; i++) {
+                    const interest = balance * monthlyRate;
+                    let paymentForPeriod = monthlyPayment;
+                    let principalPaidForPeriod;
+
+                    if (i === term) { // Last payment
+                        principalPaidForPeriod = balance - balloonPayment;
+                        // The payment should cover the remaining principal (less balloon) + interest
+                        paymentForPeriod = principalPaidForPeriod + interest + balloonPayment;
+                        balance = balloonPayment; // Balance becomes the balloon amount
+                    } else {
+                        principalPaidForPeriod = monthlyPayment - interest;
+                        balance -= principalPaidForPeriod;
+                    }
+                    
+                    // Ensure principal paid isn't negative if payment is less than interest (can happen with very low payments / high interest)
+                    if (principalPaidForPeriod < 0 && i < term) principalPaidForPeriod = 0;
+
+
+                    schedule.push({
+                        date: new Date(currentDate),
+                        payment: paymentForPeriod,
+                        principal: principalPaidForPeriod,
+                        interest: interest,
+                        balance: Math.max(0, balance) // Ensure balance never goes below 0 before final balloon
+                    });
+                    
+                    if (i === term) { // After recording the last payment, set final balance to 0 if balloon was paid.
+                        schedule[schedule.length-1].balance = 0;
+                    }
+
+
+                    currentDate.setMonth(currentDate.getMonth() + 1);
+                }
+                return schedule;
+            }
+
+            function displaySchedule(schedule) {
+                const scheduleBody = document.getElementById('scheduleBody');
+                scheduleBody.innerHTML = '';
+                
+                schedule.forEach(payment => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${payment.date.toLocaleDateString('en-US', {
+                            year: 'numeric',
+                            month: 'short',
+                            day: 'numeric'
+                        })}</td>
+                        <td>${formatCurrency(payment.payment)}</td>
+                        <td>${formatCurrency(payment.principal)}</td>
+                        <td>${formatCurrency(payment.interest)}</td>
+                        <td>${formatCurrency(payment.balance)}</td>
+                    `;
+                    scheduleBody.appendChild(row);
+                });
+            }
+
+            function downloadAmortizationSchedule() {
+                 const scheduleBody = document.getElementById('scheduleBody');
+                if (!scheduleBody.hasChildNodes()) {
+                    alert("Please calculate the loan first to generate a schedule.");
+                    return;
+                }
+                let csv = 'Payment Date,Payment Amount,Principal,Interest,Remaining Balance\n';
+                const rows = scheduleBody.querySelectorAll('tr');
+                rows.forEach(row => {
+                    const cells = row.querySelectorAll('td');
+                    const rowData = Array.from(cells).map(cell => `"${cell.textContent.replace(/"/g, '""')}"`).join(',');
+                    csv += rowData + '\n';
+                });
+
+                const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.setAttribute('hidden', '');
+                a.setAttribute('href', url);
+                a.setAttribute('download', 'equipment_finance_schedule.csv');
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+            }
+
+            function resetCalculator() {
+                document.getElementById('equipmentForm').reset();
+                document.getElementById('startDate').valueAsDate = new Date();
+                document.getElementById('results').classList.add('hidden');
+            }
+
+            function formatCurrency(number) {
+                return new Intl.NumberFormat('en-US', {
+                    style: 'currency',
+                    currency: 'USD',
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                }).format(number);
+            }
+        });
+    </script>
+</body>
+</html>

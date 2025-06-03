@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Commercial Property Loan Calculator</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #64748b;
+            --success-color: #059669;
+            --background-color: #f1f5f9;
+            --card-background: #ffffff;
+            --text-color: #1e293b;
+            --border-color: #e2e8f0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.5;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .calculator-card {
+            background: var(--card-background);
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: var(--primary-color);
+            color: white;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .calculator-body {
+            padding: 2rem;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .form-group label {
+            font-weight: 500;
+            color: var(--text-color);
+        }
+
+        .input-group {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .currency {
+            position: absolute;
+            left: 0.75rem;
+            color: var(--secondary-color);
+        }
+
+        input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            transition: border-color 0.2s;
+        }
+
+        input[type="text"] {
+            padding-left: 2rem;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #1d4ed8;
+        }
+
+        .btn-secondary {
+            background: var(--secondary-color);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #475569;
+        }
+
+        .results {
+            border-top: 1px solid var(--border-color);
+            padding-top: 2rem;
+        }
+
+        .results.hidden {
+            display: none;
+        }
+
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .summary-card {
+            background: var(--background-color);
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            text-align: center;
+        }
+
+        .summary-card h3 {
+            font-size: 1rem;
+            color: var(--secondary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .summary-card p {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-color);
+        }
+
+        .payment-schedule {
+            margin-top: 2rem;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background: var(--background-color);
+            font-weight: 600;
+        }
+
+        .download-btn {
+            margin-top: 1rem;
+            background: var(--success-color);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .download-btn:hover {
+            background: #047857;
+        }
+
+        .footer-note {
+            margin-top: 1.5rem;
+            color: var(--secondary-color);
+            font-size: 0.875rem;
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+
+            .calculator-body {
+                padding: 1rem;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+
+        /* Added for new sections */
+        .info-section {
+            margin-top: 2.5rem;
+            padding: 1.5rem;
+            background-color: var(--card-background);
+            border-radius: 0.75rem;
+            box-shadow: 0 2px 4px -1px rgb(0 0 0 / 0.08);
+            border: 1px solid var(--border-color);
+        }
+
+        .info-section h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+        }
+        
+        .info-section h2 i.fas { /* Be specific for Font Awesome icons */
+            margin-right: 0.75rem;
+            font-size: 1.1em; 
+            color: var(--primary-color); /* Ensure icon color matches */
+        }
+
+        .info-section p, .info-section ul {
+            margin-bottom: 1rem;
+            color: var(--secondary-color);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+        
+        .info-section .example-box {
+            background-color: #e0e7ff; /* Lighter blue for example */
+            padding: 1rem;
+            border-radius: 0.5rem;
+            border-left: 4px solid var(--primary-color);
+            margin-top: 0.5rem;
+            margin-bottom: 1rem; /* Added margin bottom */
+        }
+        
+        .info-section .example-box p {
+            color: #3730a3; /* Darker blue for example text */
+            font-size: 0.9rem;
+            margin-bottom: 0;
+        }
+
+        .disclaimer-box {
+            background-color: #fef3c7; /* Lighter yellow for disclaimer */
+            padding: 1rem;
+            border-radius: 0.5rem;
+            border-left: 4px solid #f59e0b; /* Amber color */
+            margin-bottom: 1rem; /* Added margin bottom */
+        }
+        
+        .disclaimer-box p {
+            color: #92400e; /* Darker amber for disclaimer text */
+            font-size: 0.9rem;
+            margin-bottom: 0;
+        }
+        .disclaimer-box h2 i.fas { /* Specific for disclaimer icon */
+             color: #f59e0b; /* Amber icon color */
+        }
+
+
+        .other-calculators-list {
+            list-style: none;
+            padding-left: 0;
+            columns: 2; /* Display links in two columns */
+            gap: 1rem;
+        }
+
+        .other-calculators-list li {
+            margin-bottom: 0.6rem;
+            break-inside: avoid-column; /* Prevent items from breaking across columns */
+        }
+
+        .other-calculators-list a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .other-calculators-list a:hover {
+            color: #1d4ed8; 
+            text-decoration: underline;
+        }
+
+        /* CTA Section Styles (adapted from user's index.html) */
+        .cta-section-container { /* A wrapper for the CTA to be placed within calculator-body */
+             margin-top: 2.5rem;
+        }
+        .cta-section {
+            padding: 2.5rem 1.5rem; 
+            background-color: var(--primary-color); 
+            color: white;
+            border-radius: 0.75rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+        }
+
+        .cta-section .background-image-container { 
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+        }
+        .cta-section .background-image-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.1; /* Default opacity for background image */
+        }
+
+        .cta-section .content-wrapper {
+            position: relative;
+            z-index: 1;
+        }
+
+        .cta-section h2 {
+            font-size: 1.75rem; 
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            color: white; 
+        }
+        
+        .cta-section h2 i.fas { /* Reset icon styling if used in CTA h2 */
+             margin-right: 0;
+             font-size: 1em;
+             color: white; /* Ensure CTA icon is white if used */
+        }
+
+        .cta-section p {
+            font-size: 1.05rem; /* Slightly adjusted size */
+            margin-bottom: 1.25rem; /* Adjusted margin */
+            color: rgba(255, 255, 255, 0.9);
+            max-width: 700px; /* Limit width for readability */
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .cta-btn {
+            display: inline-block;
+            padding: 0.85rem 2.25rem; /* Slightly larger padding */
+            background-color: white;
+            color: var(--primary-color);
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 9999px; 
+            text-decoration: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+
+        .cta-btn:hover {
+            background-color: #f8fafc; /* Lighter white/gray */
+            color: #1d4ed8; /* Darker primary on hover */
+            transform: translateY(-2px) scale(1.03);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="calculator-card">
+            <div class="header">
+                <h1>Commercial Property Loan Calculator</h1>
+            </div>
+            <div class="calculator-body">
+                <form id="propertyForm">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="propertyValue">Property Value</label>
+                            <div class="input-group">
+                                <span class="currency">$</span>
+                                <input type="text" id="propertyValue" required placeholder="Enter property value">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="loanAmount">Loan Amount</label>
+                            <div class="input-group">
+                                <span class="currency">$</span>
+                                <input type="text" id="loanAmount" required placeholder="Enter loan amount">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="interestRate">Interest Rate (%)</label>
+                            <input type="number" id="interestRate" required min="0.1" step="0.1" placeholder="Enter interest rate">
+                        </div>
+                        <div class="form-group">
+                            <label for="loanTerm">Loan Term (years)</label>
+                            <input type="number" id="loanTerm" required min="1" step="1" placeholder="Enter loan term">
+                        </div>
+                    </div>
+                    <div class="button-group">
+                        <button type="submit" class="btn btn-primary">Calculate</button>
+                        <button type="button" id="resetBtn" class="btn btn-secondary">Reset</button>
+                    </div>
+                </form>
+
+                <div id="results" class="results hidden">
+                    <div class="summary-cards">
+                        <div class="summary-card">
+                            <h3>Monthly Payment</h3>
+                            <p id="monthlyPayment">$0.00</p>
+                        </div>
+                        <div class="summary-card">
+                            <h3>Total Interest</h3>
+                            <p id="totalInterest">$0.00</p>
+                        </div>
+                        <div class="summary-card">
+                            <h3>Loan-to-Value (LTV)</h3>
+                            <p id="ltvRatio">0%</p>
+                        </div>
+                        <div class="summary-card">
+                            <h3>Total Amount</h3>
+                            <p id="totalAmount">$0.00</p>
+                        </div>
+                    </div>
+
+                    <div class="payment-schedule">
+                        <button id="downloadCSV" class="download-btn">Download Amortization Schedule (CSV)</button>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Year</th>
+                                    <th>Payment</th>
+                                    <th>Principal</th>
+                                    <th>Interest</th>
+                                    <th>Remaining Balance</th>
+                                </tr>
+                            </thead>
+                            <tbody id="scheduleBody"></tbody>
+                        </table>
+                    </div>
+
+                    <div class="footer-note">
+                        Note: Calculations are based on a fixed interest rate and monthly payments
+                    </div>
+                </div>
+
+                <!-- How to Use Section -->
+                <div class="info-section">
+                    <h2><i class="fas fa-info-circle"></i>How to Use</h2>
+                    <p>Enter the loan amount, interest rate, and loan term to calculate your monthly mortgage payment.</p>
+                    <div class="example-box">
+                        <p><strong>Example:</strong><br>
+                        Loan Amount: $500,000, Interest Rate: 4.5%, Loan Term: 20 years = Monthly Payment ≈ $3,167.79</p>
+                    </div>
+                </div>
+
+                <!-- Financial Disclaimer Section -->
+                <div class="info-section disclaimer-box">
+                    <h2><i class="fas fa-shield-alt"></i>Financial Disclaimer</h2>
+                    <p>This calculator provides estimates based on the information you input and is for illustrative purposes only. It does not constitute financial advice. Consult with a financial advisor for personalized advice.</p>
+                </div>
+
+                <!-- Other Calculators Section -->
+                <div class="info-section">
+                    <h2><i class="fas fa-calculator"></i>Other Calculators</h2>
+                    <ul class="other-calculators-list">
+                        <li><a href="1auto_loan_calculator.html">Auto Loan Calculator</a></li>
+                        <li><a href="Business-Term-Loan-Calculator.html">Term Loan Calculator</a></li>
+                        <li><a href="invoice-discounting-calculator.html">Invoice Discount Finance Calculator</a></li>
+                        <li><a href="Line-of-credit-calculator.html">Line of Credit Calculator</a></li>
+                        <li><a href="equipment-finance-calculator.html">Equipment Finance Calculator</a></li>
+                        <li><a href="index.html#commercial-calculators">View All Calculators on Homepage</a></li>
+                    </ul>
+                </div>
+
+                <!-- CTA Section Container -->
+                <div class="cta-section-container">
+                    <section class="cta-section">
+                        <div class="background-image-container">
+                            <img src="https://images.unsplash.com/photo-1551434678-e076c223a692?auto=format&fit=crop&w=2000" alt="Background">
+                        </div>
+                        <div class="content-wrapper">
+                            <h2>Ready to Turn Your Calculations into Reality?</h2>
+                            <p>You've taken the first step by using our business calculator to explore your financial possibilities. Now, let's make those numbers work for you!</p>
+                            <p>Speak with one of our experienced commercial finance professionals to develop a custom strategy tailored to your business needs. Discover how you can secure the funding necessary to achieve your business goals and drive success.</p>
+                            <p>Contact us today to schedule your personalized consultation!</p>
+                            <a href="briansavic.com" class="cta-btn">
+                                Get Started Now
+                            </a>
+                        </div>
+                    </section>
+                </div>
+            </div> <!-- End of calculator-body -->
+        </div> <!-- End of calculator-card -->
+    </div> <!-- End of container -->
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Format currency inputs with commas
+            const currencyInputs = ['propertyValue', 'loanAmount'];
+            currencyInputs.forEach(inputId => {
+                const input = document.getElementById(inputId);
+                input.addEventListener('input', function(e) {
+                    let value = this.value.replace(/[^\d]/g, '');
+                    if (value) {
+                        value = parseInt(value).toLocaleString('en-US');
+                    }
+                    this.value = value;
+                });
+            });
+
+            // Form submission handler
+            document.getElementById('propertyForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                calculateLoan();
+            });
+
+            // Reset button handler
+            document.getElementById('resetBtn').addEventListener('click', resetCalculator);
+
+            // Download CSV handler
+            document.getElementById('downloadCSV').addEventListener('click', downloadAmortizationSchedule);
+
+            function calculateLoan() {
+                // Get input values
+                const propertyValue = parseFloat(document.getElementById('propertyValue').value.replace(/,/g, '')) || 0;
+                const loanAmount = parseFloat(document.getElementById('loanAmount').value.replace(/,/g, '')) || 0;
+                const interestRate = parseFloat(document.getElementById('interestRate').value) || 0;
+                const loanTerm = parseInt(document.getElementById('loanTerm').value) || 0;
+
+                // Validation
+                if (propertyValue <= 0) {
+                    alert('Please enter a valid property value');
+                    return;
+                }
+
+                if (loanAmount <= 0) {
+                    alert('Please enter a valid loan amount');
+                    return;
+                }
+
+                if (loanAmount > propertyValue) {
+                    alert('Loan amount cannot exceed property value');
+                    return;
+                }
+
+                if (interestRate <= 0) {
+                    alert('Please enter a valid interest rate');
+                    return;
+                }
+
+                if (loanTerm <= 0) {
+                    alert('Please enter a valid loan term');
+                    return;
+                }
+
+                // Calculate monthly payment
+                const monthlyRate = interestRate / 100 / 12;
+                const numberOfPayments = loanTerm * 12;
+                const monthlyPayment = calculateMonthlyPayment(loanAmount, monthlyRate, numberOfPayments);
+
+                // Calculate total interest
+                const totalAmount = monthlyPayment * numberOfPayments;
+                const totalInterest = totalAmount - loanAmount;
+
+                // Calculate LTV
+                const ltv = (loanAmount / propertyValue) * 100;
+
+                // Display results
+                document.getElementById('results').classList.remove('hidden');
+                document.getElementById('monthlyPayment').textContent = formatCurrency(monthlyPayment);
+                document.getElementById('totalInterest').textContent = formatCurrency(totalInterest);
+                document.getElementById('ltvRatio').textContent = ltv.toFixed(1) + '%';
+                document.getElementById('totalAmount').textContent = formatCurrency(totalAmount);
+
+                // Generate and display amortization schedule
+                const schedule = generateAmortizationSchedule(loanAmount, monthlyRate, numberOfPayments, monthlyPayment);
+                displaySchedule(schedule);
+
+                // Scroll to results
+                document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+            }
+
+            function calculateMonthlyPayment(principal, monthlyRate, numberOfPayments) {
+                if (monthlyRate === 0) return principal / numberOfPayments;
+                return principal * (monthlyRate * Math.pow(1 + monthlyRate, numberOfPayments)) / (Math.pow(1 + monthlyRate, numberOfPayments) - 1);
+            }
+
+            function generateAmortizationSchedule(principal, monthlyRate, numberOfPayments, monthlyPayment) {
+                const schedule = [];
+                let balance = principal;
+                let totalPrincipal = 0;
+                let totalInterest = 0;
+                const paymentsPerYear = 12;
+
+                for (let year = 1; year <= numberOfPayments / paymentsPerYear; year++) {
+                    let yearlyPrincipal = 0;
+                    let yearlyInterest = 0;
+
+                    for (let month = 1; month <= paymentsPerYear; month++) {
+                        const interest = balance * monthlyRate;
+                        const principalPaid = monthlyPayment - interest;
+                        
+                        yearlyPrincipal += principalPaid;
+                        yearlyInterest += interest;
+                        balance = Math.max(0, balance - principalPaid);
+                    }
+
+                    totalPrincipal += yearlyPrincipal;
+                    totalInterest += yearlyInterest;
+
+                    schedule.push({
+                        year: year,
+                        payment: monthlyPayment * paymentsPerYear,
+                        principal: yearlyPrincipal,
+                        interest: yearlyInterest,
+                        balance: balance
+                    });
+                }
+
+                return schedule;
+            }
+
+            function displaySchedule(schedule) {
+                const scheduleBody = document.getElementById('scheduleBody');
+                scheduleBody.innerHTML = '';
+                
+                schedule.forEach(payment => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>Year ${payment.year}</td>
+                        <td>${formatCurrency(payment.payment)}</td>
+                        <td>${formatCurrency(payment.principal)}</td>
+                        <td>${formatCurrency(payment.interest)}</td>
+                        <td>${formatCurrency(payment.balance)}</td>
+                    `;
+                    scheduleBody.appendChild(row);
+                });
+            }
+
+            function downloadAmortizationSchedule() {
+                const table = document.querySelector('.payment-schedule table');
+                let csv = 'Year,Payment,Principal,Interest,Remaining Balance\n';
+                
+                const rows = table.querySelectorAll('tr');
+                for (let i = 1; i < rows.length; i++) {
+                    const cells = rows[i].querySelectorAll('td');
+                    const rowData = Array.from(cells).map(cell => cell.textContent.replace(/,/g, '')).join(',');
+                    csv += rowData + '\n';
+                }
+
+                const blob = new Blob([csv], { type: 'text/csv' });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.setAttribute('hidden', '');
+                a.setAttribute('href', url);
+                a.setAttribute('download', 'amortization_schedule.csv');
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+            }
+
+            function resetCalculator() {
+                document.getElementById('propertyForm').reset();
+                document.getElementById('results').classList.add('hidden');
+            }
+
+            function formatCurrency(number) {
+                return new Intl.NumberFormat('en-US', {
+                    style: 'currency',
+                    currency: 'USD',
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                }).format(number);
+            }
+        });
+    </script>
+</body>
+</html>

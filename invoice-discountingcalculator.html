@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice Discounting Calculator</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #64748b; /* For general secondary text, input borders etc. */
+            --success-color: #059669;
+            --background-color: #f1f5f9;
+            --card-background: #ffffff;
+            --text-color: #1e293b;
+            --border-color: #e2e8f0; /* Used for general borders */
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.5;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .calculator-card {
+            background: var(--card-background);
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: var(--primary-color);
+            color: white;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .calculator-body {
+            padding: 2rem;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .form-group label {
+            font-weight: 500;
+            color: var(--text-color);
+        }
+
+        .input-group {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .currency {
+            position: absolute;
+            left: 0.75rem;
+            color: var(--secondary-color);
+        }
+        
+        .percentage { /* Added for percentage inputs */
+            position: absolute;
+            right: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--secondary-color);
+        }
+
+        input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            transition: border-color 0.2s;
+        }
+
+        input[type="text"] {
+            padding-left: 2rem;
+        }
+        input[type="number"] { /* Ensure padding for percentage symbol */
+            padding-right: 2.5rem;
+        }
+
+
+        input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #1d4ed8;
+        }
+
+        .btn-secondary {
+            background: var(--secondary-color);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #475569;
+        }
+
+        .results {
+            border-top: 1px solid var(--border-color);
+            padding-top: 2rem;
+        }
+
+        .results.hidden {
+            display: none;
+        }
+
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .summary-card {
+            background: var(--background-color);
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            text-align: center;
+        }
+
+        .summary-card h3 {
+            font-size: 1rem;
+            color: var(--secondary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .summary-card p {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-color);
+        }
+
+        .footer-note {
+            margin-top: 1.5rem;
+            color: var(--secondary-color);
+            font-size: 0.875rem;
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+
+            .calculator-body {
+                padding: 1rem;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+
+        /* Added for new sections */
+        .info-section {
+            margin-top: 2.5rem;
+            padding: 1.5rem;
+            background-color: var(--card-background);
+            border-radius: 0.75rem;
+            box-shadow: 0 2px 4px -1px rgb(0 0 0 / 0.08);
+            border: 1px solid var(--border-color);
+        }
+
+        .info-section h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+        }
+        
+        .info-section h2 i.fas { 
+            margin-right: 0.75rem;
+            font-size: 1.1em; 
+            color: var(--primary-color); 
+        }
+
+        .info-section p, .info-section ul {
+            margin-bottom: 1rem;
+            color: var(--secondary-color);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+        
+        .info-section .example-box {
+            background-color: #e0e7ff; 
+            padding: 1rem;
+            border-radius: 0.5rem;
+            border-left: 4px solid var(--primary-color);
+            margin-top: 0.5rem;
+            margin-bottom: 1rem; 
+        }
+        
+        .info-section .example-box p {
+            color: #3730a3; 
+            font-size: 0.9rem;
+            margin-bottom: 0;
+        }
+
+        .disclaimer-box {
+            background-color: #fef3c7; 
+            padding: 1rem;
+            border-radius: 0.5rem;
+            border-left: 4px solid #f59e0b; 
+            margin-bottom: 1rem; 
+        }
+        
+        .disclaimer-box p {
+            color: #92400e; 
+            font-size: 0.9rem;
+            margin-bottom: 0;
+        }
+        .disclaimer-box h2 i.fas { 
+             color: #f59e0b; 
+        }
+
+        .other-calculators-list {
+            list-style: none;
+            padding-left: 0;
+            columns: 2; 
+            gap: 1rem;
+        }
+
+        .other-calculators-list li {
+            margin-bottom: 0.6rem;
+            break-inside: avoid-column; 
+        }
+
+        .other-calculators-list a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .other-calculators-list a:hover {
+            color: #1d4ed8; 
+            text-decoration: underline;
+        }
+
+        .cta-section-container { 
+             margin-top: 2.5rem;
+        }
+        .cta-section {
+            padding: 2.5rem 1.5rem; 
+            background-color: var(--primary-color); 
+            color: white;
+            border-radius: 0.75rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+        }
+
+        .cta-section .background-image-container { 
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+        }
+        .cta-section .background-image-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.1; 
+        }
+
+        .cta-section .content-wrapper {
+            position: relative;
+            z-index: 1;
+        }
+
+        .cta-section h2 {
+            font-size: 1.75rem; 
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            color: white; 
+        }
+        
+        .cta-section h2 i.fas { 
+             margin-right: 0;
+             font-size: 1em;
+             color: white; 
+        }
+
+        .cta-section p {
+            font-size: 1.05rem; 
+            margin-bottom: 1.25rem; 
+            color: rgba(255, 255, 255, 0.9);
+            max-width: 700px; 
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .cta-btn {
+            display: inline-block;
+            padding: 0.85rem 2.25rem; 
+            background-color: white;
+            color: var(--primary-color);
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 9999px; 
+            text-decoration: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+
+        .cta-btn:hover {
+            background-color: #f8fafc; 
+            color: #1d4ed8; 
+            transform: translateY(-2px) scale(1.03);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="calculator-card">
+            <div class="header">
+                <h1>Invoice Discounting Calculator</h1>
+            </div>
+            <div class="calculator-body">
+                <form id="invoiceForm">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="invoiceAmount">Invoice Amount</label>
+                            <div class="input-group">
+                                <span class="currency">$</span>
+                                <input type="text" id="invoiceAmount" required placeholder="Enter invoice amount">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="advanceRate">Advance Rate (%)</label>
+                            <div class="input-group">
+                                <input type="number" id="advanceRate" required min="1" max="100" step="0.1" placeholder="Enter advance rate">
+                                <span class="percentage">%</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="feeRate">Fee Rate (%)</label>
+                             <div class="input-group">
+                                <input type="number" id="feeRate" required min="0.1" step="0.1" placeholder="Enter fee rate">
+                                <span class="percentage">%</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="term">Term (days)</label>
+                            <input type="number" id="term" required min="1" step="1" placeholder="Enter term in days">
+                        </div>
+                    </div>
+                    <div class="button-group">
+                        <button type="submit" class="btn btn-primary">Calculate</button>
+                        <button type="button" id="resetBtn" class="btn btn-secondary">Reset</button>
+                    </div>
+                </form>
+
+                <div id="results" class="results hidden">
+                    <div class="summary-cards">
+                        <div class="summary-card">
+                            <h3>Advance Amount</h3>
+                            <p id="advanceAmount">$0.00</p>
+                        </div>
+                        <div class="summary-card">
+                            <h3>Fee Amount</h3>
+                            <p id="feeAmount">$0.00</p>
+                        </div>
+                        <div class="summary-card">
+                            <h3>Amount to Repay</h3>
+                            <p id="repayAmount">$0.00</p>
+                        </div>
+                    </div>
+
+                    <div class="footer-note">
+                        Note: Calculations are based on simple fee structure without additional charges
+                    </div>
+                </div>
+
+                <!-- How to Use Section -->
+                <div class="info-section">
+                    <h2><i class="fas fa-info-circle"></i>How to Use</h2>
+                    <p>Enter the total invoice amount, the percentage the lender will advance, the fee rate charged by the lender, and the term (in days) for which the invoice is outstanding.</p>
+                    <div class="example-box">
+                        <p><strong>Example:</strong><br>
+                        Invoice Amount: $10,000, Advance Rate: 80%, Fee Rate: 2.5%, Term: 30 days<br>
+                        Advance Amount: $8,000, Fee Amount: $250, Amount to Repay: $8,250</p>
+                    </div>
+                </div>
+
+                <!-- Financial Disclaimer Section -->
+                <div class="info-section disclaimer-box">
+                    <h2><i class="fas fa-shield-alt"></i>Financial Disclaimer</h2>
+                    <p>This calculator provides estimates based on the information you input and is for illustrative purposes only. It does not constitute financial advice. Consult with a financial advisor for personalized advice.</p>
+                </div>
+
+                <!-- Other Calculators Section -->
+                <div class="info-section">
+                    <h2><i class="fas fa-calculator"></i>Other Calculators</h2>
+                    <ul class="other-calculators-list">
+                        <li><a href="Commercial-property-calculator.html">Commercial Property Calculator</a></li>
+                        <li><a href="1auto-loan-calculator.html">Auto Loan Calculator</a></li>
+                        <li><a href="Business-Term-Loan-Calculator.html">Term Loan Calculator</a></li>
+                        <li><a href="Line-of-credit-calculator.html">Line of Credit Calculator</a></li>
+                        <li><a href="equipment-finance-calculator.html">Equipment Finance Calculator</a></li>
+                        <li><a href="index.html#commercial-calculators">View All Calculators on Homepage</a></li>
+                    </ul>
+                </div>
+
+                <!-- CTA Section Container -->
+                <div class="cta-section-container">
+                    <section class="cta-section">
+                        <div class="background-image-container">
+                            <img src="https://images.unsplash.com/photo-1551434678-e076c223a692?auto=format&fit=crop&w=2000" alt="Background">
+                        </div>
+                        <div class="content-wrapper">
+                            <h2>Ready to Turn Your Calculations into Reality?</h2>
+                            <p>You've taken the first step by using our business calculator to explore your financial possibilities. Now, let's make those numbers work for you!</p>
+                            <p>Speak with one of our experienced commercial finance professionals to develop a custom strategy tailored to your business needs. Discover how you can secure the funding necessary to achieve your business goals and drive success.</p>
+                            <p>Contact us today to schedule your personalized consultation!</p>
+                            <a href="briansavic.com" class="cta-btn">
+                                Get Started Now
+                            </a>
+                        </div>
+                    </section>
+                </div>
+            </div> <!-- End of calculator-body -->
+        </div> <!-- End of calculator-card -->
+    </div> <!-- End of container -->
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Format currency inputs with commas
+            const invoiceAmountInput = document.getElementById('invoiceAmount');
+            invoiceAmountInput.addEventListener('input', function(e) {
+                let value = this.value.replace(/[^\d]/g, '');
+                if (value) {
+                    value = parseInt(value).toLocaleString('en-US');
+                }
+                this.value = value;
+            });
+
+            // Form submission handler
+            document.getElementById('invoiceForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                calculateInvoiceDiscount();
+            });
+
+            // Reset button handler
+            document.getElementById('resetBtn').addEventListener('click', resetCalculator);
+
+            function calculateInvoiceDiscount() {
+                // Get input values
+                const invoiceAmount = parseFloat(document.getElementById('invoiceAmount').value.replace(/,/g, '')) || 0;
+                const advanceRate = parseFloat(document.getElementById('advanceRate').value) || 0;
+                const feeRate = parseFloat(document.getElementById('feeRate').value) || 0;
+                const term = parseInt(document.getElementById('term').value) || 0;
+
+                // Validation
+                if (invoiceAmount <= 0) {
+                    alert('Please enter a valid invoice amount');
+                    return;
+                }
+
+                if (advanceRate <= 0 || advanceRate > 100) {
+                    alert('Advance rate must be between 1 and 100');
+                    return;
+                }
+
+                if (feeRate <= 0) {
+                    alert('Please enter a valid fee rate');
+                    return;
+                }
+
+                if (term <= 0) {
+                    alert('Please enter a valid term');
+                    return;
+                }
+
+                // Calculate values
+                const advanceAmount = invoiceAmount * (advanceRate / 100);
+                // Assuming fee rate is a percentage of the invoice amount for the term, not an annualized rate.
+                // If it's an annualized rate, the calculation would be: invoiceAmount * (feeRate / 100) * (term / 365)
+                const feeAmount = invoiceAmount * (feeRate / 100); 
+                const repayAmount = advanceAmount + feeAmount; // This might be simplified; typically you repay the advance + fee.
+                                                            // Or, the fee is deducted from the advance.
+                                                            // For this example, we assume the fee is added to what's repaid on top of the advance.
+                                                            // A more common model: you get `advanceAmount - feeAmount` and repay `advanceAmount`.
+                                                            // Or you get `advanceAmount` and repay `advanceAmount + feeAmount`.
+                                                            // The current setup implies the latter.
+
+                // Display results
+                document.getElementById('results').classList.remove('hidden');
+                document.getElementById('advanceAmount').textContent = formatCurrency(advanceAmount);
+                document.getElementById('feeAmount').textContent = formatCurrency(feeAmount);
+                document.getElementById('repayAmount').textContent = formatCurrency(repayAmount);
+
+                // Scroll to results
+                document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+            }
+
+            function resetCalculator() {
+                document.getElementById('invoiceForm').reset();
+                document.getElementById('results').classList.add('hidden');
+            }
+
+            function formatCurrency(number) {
+                return new Intl.NumberFormat('en-US', {
+                    style: 'currency',
+                    currency: 'USD',
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                }).format(number);
+            }
+        });
+    </script>
+</body>
+</html>
