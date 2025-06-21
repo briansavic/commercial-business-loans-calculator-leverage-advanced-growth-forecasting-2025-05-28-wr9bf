@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pricing Tiers</title>
+    <style>
+.pricing-container {
+    display: flex;
+    justify-content: center;
+    gap: 30px; /* Space between cards */
+    max-width: 800px;
+    width: 100%;
+    margin: 0 auto;
+    font-family: 'Arial', sans-serif;
+    background-color: #f8fafc;
+    padding: 40px 20px;
+    box-sizing: border-box;
+}
+
+.pricing-tier {
+    background-color: white;
+    border-radius: 20px;
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+    padding: 30px;
+    width: 233px; /* Base width, will adjust with flex */
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    text-align: center;
+    position: relative; /* Needed for absolute positioning of the banner */
+    overflow: hidden; /* To clip the banner's corners if it extends outside */
+}
+
+.pricing-tier:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+}
+
+.pricing-tier.popular {
+    border: 3px solid #ec4899; /* Highlight for popular tier */
+    transform: translateY(-20px) scale(1.05); /* Make it stand out */
+    /* padding-top: 50px; /* Add padding to make space for the banner if it's inside */
+}
+
+.pricing-tier.popular:hover {
+    transform: translateY(-30px) scale(1.05); /* Enhanced hover for popular */
+}
+
+.popular-banner {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #ec4899;
+    color: white;
+    padding: 8px 80px; /* Increased padding for wider banner */
+    font-size: 14px;
+    font-weight: bold;
+    text-transform: uppercase;
+    width: 100%; /* Make banner stretch across the card */
+    box-sizing: border-box; /* Include padding in width calculation */
+    text-align: center;
+    z-index: 1; /* Ensure banner is above other content */
+    /* Optional: for a ribbon style that cuts corners */
+    /* clip-path: polygon(0 0, 100% 0, 90% 100%, 10% 100%); */
+}
+
+/* Adjust header to be below the banner */
+.pricing-tier.popular .tier-header {
+    padding-top: 40px; /* Add space for the banner above the header */
+}
+
+
+.tier-header h2 {
+    font-size: 24px;
+    font-weight: bold;
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+
+.pricing-tier:nth-child(1) .tier-header h2 {
+    color: #4f46e5; /* Quick Win */
+}
+
+.pricing-tier:nth-child(2) .tier-header h2 {
+    color: #ec4899; /* Authority Builder */
+}
+
+.pricing-tier:nth-child(3) .tier-header h2 {
+    color: #f59e0b; /* Empire Builder */
+}
+
+.tier-header .price {
+    font-size: 32px;
+    font-weight: bold;
+    color: #1e293b;
+    margin-bottom: 25px;
+}
+
+.features {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 30px 0;
+    text-align: left;
+    flex-grow: 1; /* Allows features list to take available space */
+}
+
+.features li {
+    color: #64748b;
+    margin-bottom: 15px;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+}
+
+.features li::before { /* Using emoji directly in HTML is simpler, but this is an alternative */
+    margin-right: 10px;
+    font-size: 18px;
+}
+
+.cta-button {
+    display: inline-block;
+    padding: 12px 25px;
+    border-radius: 15px;
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 16px;
+    transition: filter 0.2s ease, transform 0.2s ease;
+    margin-top: auto; /* Pushes button to the bottom */
+}
+
+.cta-button:hover {
+    filter: brightness(1.1);
+    transform: scale(1.05);
+}
+
+.pricing-tier:nth-child(1) .cta-button {
+    background-color: #4f46e5;
+}
+
+.pricing-tier:nth-child(2) .cta-button {
+    background-color: #ec4899;
+}
+
+.pricing-tier:nth-child(3) .cta-button {
+    background-color: #f59e0b;
+}
+
+/* Responsive adjustments */
+
+@media (max-width: 600px) {
+    .pricing-container {
+        flex-direction: column;
+        align-items: center;
+    }
+    .pricing-tier {
+        width: 90%; /* Single column, wider */
+        max-width: 400px;
+        margin-bottom: 30px; /* Add margin for stacked cards */
+    }
+    .pricing-tier:last-child {
+        margin-bottom: 0;
+    }
+    .pricing-tier.popular {
+        transform: scale(1.05); /* Reset Y transform for single column */
+    }
+     .pricing-tier.popular:hover {
+        transform: translateY(-10px) scale(1.05);
+    }
+}
+    </style>
+</head>
+<body>
+    <div class="pricing-container">
+        <!-- Quick Win Tier -->
+        <div class="pricing-tier">
+            <div class="tier-header">
+                <h2>🎯 Quick Win</h2>
+                <p class="price">$997</p>
+            </div>
+            <ul class="features">
+                <li>🌟 Single ExpertGram</li>
+                <li>📱 Social Optimization</li>
+                <li>📈 Distribution Strategy</li>
+                <li>⚖️ Full Usage Rights</li>
+            </ul>
+            <a href="#" class="cta-button">Get Started</a>
+        </div>
+
+        <!-- Authority Builder Tier -->
+        <div class="pricing-tier popular">
+            <div class="popular-banner">Most Popular</div>
+            <div class="tier-header">
+                <h2>⭐ Authority Builder</h2>
+                <p class="price">$1,500/mo</p>
+            </div>
+            <ul class="features">
+                <li>📅 Monthly ExpertGram</li>
+                <li>✍️ Weekly Blogs</li>
+                <li>📢 Social Distribution</li>
+                <li>📰 Regular Features</li>
+            </ul>
+            <a href="#" class="cta-button">Level Up</a>
+        </div>
+
+        <!-- Empire Builder Tier -->
+        <div class="pricing-tier">
+            <div class="tier-header">
+                <h2>💫 Empire Builder</h2>
+                <p class="price">$2,500/mo</p>
+            </div>
+            <ul class="features">
+                <li>📅 Weekly Content</li>
+                <li>📊 Monthly ExpertGrams</li>
+                <li>🚀 Full Distribution</li>
+                <li>🎯 Priority Coverage</li>
+            </ul>
+            <a href="#" class="cta-button">Go Premium</a>
+        </div>
+    </div>
+    <script>
+document.addEventListener('DOMContentLoaded', () => {
+    const pricingTiers = document.querySelectorAll('.pricing-tier');
+
+    pricingTiers.forEach((tier, index) => {
+        // Add a class to trigger animation
+        tier.style.opacity = '0';
+        tier.style.transform = 'translateY(20px)';
+        tier.style.transition = `opacity 0.5s ease-out ${index * 0.15}s, transform 0.5s ease-out ${index * 0.15}s`;
+
+        // Trigger reflow to apply initial styles before transitioning
+        // eslint-disable-next-line no-unused-expressions
+        tier.offsetHeight;
+
+        // Set final state for animation
+        tier.style.opacity = '1';
+        tier.style.transform = 'translateY(0)';
+    });
+
+    // Optional: Add a subtle hover effect on the container if desired
+    const container = document.querySelector('.pricing-container');
+    if (container) {
+        container.addEventListener('mousemove', (e) => {
+            // Example: A very subtle parallax effect on the container background or elements
+            // This is just a placeholder for a more complex JS visual if needed.
+            // For now, CSS handles most visual appeal.
+        });
+    }
+
+    console.log('Pricing tiers JavaScript loaded and animations initiated.');
+});
+    </script>
+</body>
+</html>
