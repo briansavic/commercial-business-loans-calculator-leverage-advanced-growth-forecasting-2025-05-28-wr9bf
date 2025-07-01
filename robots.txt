@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://commercialbusinessloanscalculator.com/sitemap.xml
